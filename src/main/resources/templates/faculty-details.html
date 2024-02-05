@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My UPES Faculty Portal</title>
+    <style>
+        body {
+          font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+          margin: 20px;
+          background-color: #67a6da;
+          color: #333;
+          text-align: center;
+        }
+
+        #facultyInfo {
+          background-color: #efc38d95;
+          border-radius: 10px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          padding: 20px;
+          margin-top: 20px;
+          display: inline-block;
+          width: 1426px; /* Set a specific width, adjust as needed */
+          text-align: left; /* Align content to the left */
+        }
+
+        #timetableContainer {
+          background-color: #78a6d7;
+          border-radius: 20px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          padding: 30px;
+          margin-top: 20px;
+          display: none;
+        }
+
+        #timetableSettings {
+          margin-top: 20px;
+        }
+
+        button {
+          background-color: #0066cc;
+          color: #ffffff;
+          border: none;
+          padding: 10px 20px;
+          font-size: 16px;
+          cursor: pointer;
+          border-radius: 5px;
+          transition: background-color 0.3s;
+        }
+
+        button:hover {
+          background-color: #005bb5;
+        }
+
+        input{
+          width: 120px;
+        }
+        select {
+          padding: 15px;
+          margin: 10px;
+          font-size: 16px;
+          width: 300px;
+          border: 1px solid #ccc;
+          border-radius: 5px;
+        }
+
+        label {
+          display: block;
+          margin-bottom: 10px;
+          font-size: 14px;
+          font-weight: bold;
+        }
+
+        #profileImage {
+          border-radius: 50%;
+          margin-bottom: 20px;
+        }
+
+        #imageInput {
+          display: none;
+        }
+
+        #imageLabel {
+          background-color: #0066cc;
+          color: #ffffff;
+          padding: 10px 15px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+
+        nav {
+          background-color: #ffffff;
+          border-radius: 10px;
+          padding-left: 86%;
+          text-align: center;
+        }
+
+        nav ul {
+          list-style-type: none;
+          margin: 0;
+          padding: 16px;
+        }
+
+        nav li {
+          display: inline;
+          margin-right: 20px;
+        }
+
+        nav a {
+          text-decoration: none;
+          color: #000000;
+          font-weight: bold;
+          font-size: 18px;
+          transition: color 0.3s;
+        }
+
+        nav a:hover {
+          color: #0b0b0b;
+        }
+
+        table {
+          width: 40%;
+          margin-top: 20px;
+          border-collapse: collapse;
+        }
+
+        table, th, td {
+          border: 1px solid #ddd;
+        }
+
+        th, td {
+          padding: 2px;
+          text-align: center;
+          block-size: 15px;
+        }
+
+        /* Additional styles for subject columns */
+        th.subject {
+          writing-mode: horizontal-tb;
+        }
+
+        td.subject {
+          vertical-align: top;
+        }
+
+        .mondayDate {
+          text-align: left;
+        }
+    </style>
+</head>
+<body>
+<img
+        src="logo.jpg"
+        alt="Your Image Description"
+        style="width: 10%; height: 50px; max-width: 800px; margin: 0; float: left"
+/>
+<nav>
+    <ul>
+        <li><a href="login">Log Out</a></li>
+    </ul>
+</nav>
+
+<div id="facultyInfo">
+    <img _ngcontent-fyp-c411="" class="user-avatar" src="female-no-image.jpg" style="float: right; margin-right: 10px; margin-top: 3%; width: 150px;">
+    <h2><strong>Welcome,</strong> <span id="facultyEmployeeFullName" th:text="${faculty.EmployeeFullName}"></span></h2>
+    <p><strong>Username:</strong> <span id="facultyUsername" th:text="${faculty.username} + '@ddn.upes.ac.in'"></span></p>
+    <p><strong>EmployeeCode:</strong> <span id="facultyEmployeeCode" th:text="${faculty.EmployeeCode}"></span></p>
+    <p><strong>Designation:</strong> <span id="facultyDesignation" th:text="${faculty.Designation}"></span></p>
+    <p><strong>ReportingManager:</strong> <span id="facultyReportingManager" th:text="${faculty.ReportingManager}"></span></p>
+    <button onclick="showTimetableForm()">Set Timetable</button>
+</div>
+
+<div id="timetableContainer">
+    <h2>Timetable Settings</h2>
+    <form id="timetableForm">
+        <label for="semester">Select Semester:</label>
+        <select id="semester" onchange="handleSemesterChange()">
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="3">Semester 3</option>
+            <option value="4">Semester 4</option>
+            <option value="5">Semester 5</option>
+            <option value="6">Semester 6</option>
+            <option value="7">Semester 7</option>
+            <option value="8">Semester 8</option>
+        </select>
+
+        <div id="timetableSettings" style="display: none; display: flex; flex-wrap: wrap;">
+            <div style="flex: 1 0 100%; display: flex; margin-bottom: 20px;">
+                <div style="flex: 1; margin-right: 20px;">
+                    <label for="block">Select Block:</label>
+                    <select id="block" onchange="updateClassOptions()">
+                        <!-- Block options will be dynamically updated -->
+                    </select>
+
+                    <label for="class">Select Room No:</label>
+                    <select id="class">
+                        <!-- Class options will be dynamically updated -->
+                    </select>
+
+                    <label for="subject">Select Subject:</label>
+                    <select id="subject">
+                        <option value="sub1">Physics</option>
+                        <option value="sub2">Discrete Mathematics</option>
+                        <option value="sub3">C-language</option>
+                        <option value="sub4">Python</option>
+                    </select>
+                </div>
+
+                <div style="flex: 1;">
+                    <label for="time">Select Time:</label>
+                    <select id="semester">
+                        <option value="1">8:00am to 8:55am</option>
+                        <option value="2">9:00am to 9:55am</option>
+                        <option value="3">10:00am to 10:55am</option>
+                    </select>
+
+                    <label for="mondayDate">Select Date:</label>
+                    <input type="date" id="mondayDate" />
+                </div>
+            </div>
+        </div>
+
+        <h3>Timetable:</h3>
+        <table>
+            <tr>
+                <th>Day</th>
+                <!-- Add subject columns -->
+                <th class="subject">8:00am-8:55am</th>
+                <th class="subject">9:00am-9:55am</th>
+                <th class="subject">10:00am-10:55am</th>
+                <th class="subject">11:00am-11:55am</th>
+                <th class="subject">12:00pm-12:55pm</th>
+                <th class="subject">13:00pm-13:55pm</th>
+                <th class="subject">14:00pm-14:55pm</th>
+                <th class="subject">15:00pm-15:55pm</th>
+                <th class="subject">16:00pm-16:55pm</th>
+                <th class="subject">17:00pm-17:55pm</th>
+
+
+            </tr>
+            <tr>
+                <td>Monday</td>
+                <td><input type="text" id="m1" /></td>
+                <td><input type="text" id="m2" /></td>
+                <td><input type="text" id="m3" /></td>
+                <td><input type="text" id="m4" /></td>
+                <td><input type="text" id="m5" /></td>
+                <td><input type="text" id="m6" /></td>
+                <td><input type="text" id="m7" /></td>
+                <td><input type="text" id="m8" /></td>
+                <td><input type="text" id="m9" /></td>
+                <td><input type="text" id="m10" /></td>
+            </tr>
+            <tr>
+                <td>Tuesday</td>
+                <td><input type="text" id="t1" /></td>
+                <td><input type="text" id="t2" /></td>
+                <td><input type="text" id="t3" /></td>
+                <td><input type="text" id="t4" /></td>
+                <td><input type="text" id="t5" /></td>
+                <td><input type="text" id="t6" /></td>
+                <td><input type="text" id="t7" /></td>
+                <td><input type="text" id="t8" /></td>
+                <td><input type="text" id="t9" /></td>
+                <td><input type="text" id="t10" /></td>
+
+
+            </tr>
+            <tr>
+                <td>Wednesday</td>
+                <td><input type="text" id="w1" /></td>
+                <td><input type="text" id="w2" /></td>
+                <td><input type="text" id="w3" /></td>
+                <td><input type="text" id="w4" /></td>
+                <td><input type="text" id="w5" /></td>
+                <td><input type="text" id="w6" /></td>
+                <td><input type="text" id="w7" /></td>
+                <td><input type="text" id="w8" /></td>
+                <td><input type="text" id="w9" /></td>
+                <td><input type="text" id="w10" /></td>
+            </tr>
+            <tr>
+                <td>Thursday</td>
+                <td><input type="text" id="th1" /></td>
+                <td><input type="text" id="th2" /></td>
+                <td><input type="text" id="th3" /></td>
+                <td><input type="text" id="th4" /></td>
+                <td><input type="text" id="th5" /></td>
+                <td><input type="text" id="th6" /></td>
+                <td><input type="text" id="th7" /></td>
+                <td><input type="text" id="th8" /></td>
+                <td><input type="text" id="th9" /></td>
+                <td><input type="text" id="th10" /></td>
+            </tr>
+            <tr>
+                <td>Friday</td>
+                <td><input type="text" id="f1" /></td>
+                <td><input type="text" id="f2" /></td>
+                <td><input type="text" id="f3" /></td>
+                <td><input type="text" id="f4" /></td>
+                <td><input type="text" id="f5" /></td>
+                <td><input type="text" id="f6" /></td>
+                <td><input type="text" id="f7" /></td>
+                <td><input type="text" id="f8" /></td>
+                <td><input type="text" id="f9" /></td>
+                <td><input type="text" id="f10" /></td>
+            <tr>
+                <td>Saturday</td>
+                <td><input type="text" id="s1" /></td>
+                <td><input type="text" id="s2" /></td>
+                <td><input type="text" id="s3" /></td>
+                <td><input type="text" id="s4" /></td>
+                <td><input type="text" id="s5" /></td>
+                <td><input type="text" id="s6" /></td>
+                <td><input type="text" id="s7" /></td>
+                <td><input type="text" id="s8" /></td>
+                <td><input type="text" id="s9" /></td>
+                <td><input type="text" id="s10" /></td>
+            </tr>
+            </tr>
+            <!-- Add rows for Tuesday to Saturday -->
+
+        </table>
+
+        <button type="button" onclick="saveTimetable()">Save Timetable</button>
+        <button type="button" onclick="downloadTimetable()">Download Timetable</button>
+    </form>
+</div>
+
+<script>
+    function showTimetableForm() {
+        var facultyName = document.getElementById('facultyUsername').textContent;
+        var facultyEmployeeCode = document.getElementById('facultyEmployeeCode').textContent;
+        var facultyDesignation = document.getElementById('facultyDesignation').textContent;
+        var facultyReportingManager = document.getElementById('facultyReportingManager').textContent;
+
+        document.getElementById('timetableContainer').style.display = 'block';
+        document.getElementById('timetableSettings').style.display = 'none'; // Hide settings initially
+
+        // Additional logic to populate or update form with faculty information
+    }
+
+    function handleSemesterChange() {
+        // Show the settings when a semester is selected
+        document.getElementById('timetableSettings').style.display = 'block';
+        updateBlockOptions();
+    }
+
+    function updateBlockOptions() {
+        var blockSelect = document.getElementById('block');
+
+        // Add new options based on the selected semester
+        var selectedSemester = document.getElementById('semester').value;
+        // Add your logic to dynamically update block options based on the selected semester
+
+        // For example, add dummy options
+        for (var i = 1; i < 12; i++) {
+            addOption(blockSelect, 'block' + i, 'Block ' + i);
+        }
+    }
+
+    function saveTimetable() {
+        var selectedBlock = document.getElementById('block').value;
+        var selectedClass = document.getElementById('class').value;
+        var selectedSubject = document.getElementById('subject').value;
+
+        // Get timetable data for Monday
+        var mondaySlot = document.getElementById('mondaySlot').value;
+        var mondayDate = document.getElementById('mondayDate').value;
+
+        // You can now save this timetable data as needed
+        // For now, let's just display an alert with the collected data
+        alert(`Timetable saved!\nBlock: ${selectedBlock}\nClass: ${selectedClass}\nSubject: ${selectedSubject}\nMonday: ${mondaySlot} at ${mondayDate}\n
+        // Add more days and time slots as needed
+        `);
+    }
+
+    function downloadTimetable() {
+        // Implement logic to download the timetable
+        // For now, let's just display a message
+        alert("Timetable downloaded!");
+    }
+
+    function updateClassOptions() {
+        var selectedBlock = document.getElementById('block').value;
+        var classSelect = document.getElementById('class');
+        classSelect.innerHTML = ''; // Clear previous options
+
+        // Add new options based on the selected block
+        // You can add your logic here to dynamically update class options based on the selected block
+
+        // For example, add dummy options
+        for (var i = 1; i < 6; i++) {
+            addOption(classSelect, 'class' + i, 'Room ' + i);
+        }
+    }
+
+    function addOption(selectElement, value, text) {
+        var option = document.createElement('option');
+        option.value = value;
+        option.text = text;
+        selectElement.appendChild(option);
+    }
+</script>
+</body>
+</html>
